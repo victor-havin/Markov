@@ -1,20 +1,35 @@
+# Markov.py
+# Simulation of a one-dimensional random walk in a time dilated field with linear gradient.
+# Compares the resulting expectancy distribution to the brachistochrone curve and an inverse quadratic function.
+#
+# Author: Victor Havin
+# Date: 2024-06-10
+
+# Prereqvisites:
+# - numpy
+# - matplotlib
+
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit
 
-LENGTH=20000
-#LENGTH=5000
-ITERATIONS=10000
-GRADIENT=2
+#simulation parameters
+LENGTH=20000            #length of the 1D space
+#LENGTH=5000            #length of the 1D space
+ITERATIONS=10000        #number of particles
+GRADIENT=2              #gradient of the time dilation field
 
+# initialization
 space=np.zeros(LENGTH)
-#time=np.linspace(0,1,LENGTH)
 time=np.linspace(0,GRADIENT,LENGTH)
-grid=np.arange(LENGTH)
 
 scale_x = np.linspace(0, 1, LENGTH)
 scale_y = np.zeros(LENGTH)
 
+# step function to move the particle based on random walk and time dilation
+# pos: current position of the particle
+# time: time dilation field
+# returns new position of the particle
 def step(pos, time):
     random=np.random.rand()
     probability=random+time[pos]
@@ -24,6 +39,10 @@ def step(pos, time):
         pos=(pos-1)
     return pos
 
+# walk function to simulate the random walk of a particle
+# start: starting position of the particle
+# length: length of the 1D space
+# updates the global space array with the number of visits to each position
 def walk(start, length):
     position=start
     while position < length:
@@ -31,6 +50,7 @@ def walk(start, length):
         if position >= 0 and position < length:
             space[position]+=1
             
+# brachistochrone curve calculation
 def brachistochrone():
     a = 0.5
     theta = np.linspace(0, np.pi, 100)
@@ -42,12 +62,14 @@ def brachistochrone():
     brach_y += 1
     return brach_y
 
+# inverse quadratic function calculation
 def inverse_quadratic():
     x = np.linspace(0.01, 1, LENGTH)
     y = 1 / (x ** 2)
     y /= np.max(y)
     return y    
 
+# plotting function
 def plot_results():
     # Post-simulation analysis and plotting
     #print(space)
@@ -62,6 +84,7 @@ def plot_results():
     plt.grid()
     plt.show()
 
+# curve fitting function
 def curve_fiting(scale, curve):
     initial_guess = [2, 1]
     bounds = ([0, 0], [np.inf, np.inf])
@@ -76,7 +99,7 @@ def curve_fiting(scale, curve):
         maxfev=10000)
     print(f"Fitted parameters: a = {params[0]}, b = {params[1]}")
     
-
+# Run the simulation
 for i in range(ITERATIONS):
     walk(1, LENGTH)
 scale_y = space / np.max(space)
