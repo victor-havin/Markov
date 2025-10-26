@@ -16,6 +16,13 @@ To run simulation with different parameters, you can adjust them in the beginnin
 * GRADIENT - field 'strength' or gradient rate
 * ITERATIONS - Number of iterations. Each iteration represents one particle.
 
+<<<<<<< HEAD
 ## Screenshot 1: Schema viewer
 ![Screenshot](Sim.10000.5000.1.png)
 
+=======
+## Screenshot 1: Simulation: length:5000,particles:10000, gradient:1
+![Screenshot](Sim.10000.5000.1.png)
+
+
+>>>>>>> d491e22ff75c5b51158d259c0661afe4a9d5fce8
