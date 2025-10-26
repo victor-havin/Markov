@@ -15,16 +15,9 @@ from scipy.optimize import curve_fit
 from spectrum import *
 
 #simulation parameters
-<<<<<<< HEAD
-LENGTH=80        #length of the 1D space
-ITERATIONS=10000       #number of particles
-GRADIENT=0.5           #gradient of the time dilation field
-=======
 LENGTH=20000            #length of the 1D space
-#LENGTH=5000            #length of the 1D space
 ITERATIONS=10000        #number of particles
 GRADIENT=2              #gradient of the time dilation field
->>>>>>> d491e22ff75c5b51158d259c0661afe4a9d5fce8
 
 # initialization
 space=np.zeros(LENGTH)
@@ -105,17 +98,7 @@ def curve_fiting(scale, curve):
         p0=initial_guess,
         bounds=bounds,
         maxfev=10000)
-<<<<<<< HEAD
-    print(f"Fitted parameters: a = {params[0]}, b = {params[1]}, c = {params[2]}")
-
-    curve = curve - params[2]  # adjust for offset
-    log_scale = np.log(scale)
-    log_curve = np.log(curve)
-    slope, intercept = np.polyfit(log_scale, log_curve, 1)
-    print(f"Logarithmic slope: {slope}")
-=======
     print(f"Fitted parameters: a = {params[0]}, b = {params[1]}")
->>>>>>> d491e22ff75c5b51158d259c0661afe4a9d5fce8
     
 # Run the simulation
 for i in range(ITERATIONS):
