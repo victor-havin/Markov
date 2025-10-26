@@ -12,12 +12,12 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit
+from spectrum import *
 
 #simulation parameters
-LENGTH=20000            #length of the 1D space
-#LENGTH=5000            #length of the 1D space
-ITERATIONS=10000        #number of particles
-GRADIENT=2              #gradient of the time dilation field
+LENGTH=80        #length of the 1D space
+ITERATIONS=10000       #number of particles
+GRADIENT=0.5           #gradient of the time dilation field
 
 # initialization
 space=np.zeros(LENGTH)
@@ -86,22 +86,30 @@ def plot_results():
 
 # curve fitting function
 def curve_fiting(scale, curve):
-    initial_guess = [2, 1]
-    bounds = ([0, 0], [np.inf, np.inf])
-    def inverse_quadratic(x, a, b):
-        return b / (x ** a) 
+    scale[0] += 1e-6  # avoid division by zero
+    initial_guess = [2, 1, 0.1]
+    bounds = ([1, 0, 0], [3, np.inf, np.inf])
+    def inverse_quadratic(x, a, b, c):
+        return b / (x ** a) + c
     params, _ = curve_fit(
         inverse_quadratic, 
-        scale,
+        scale+1e-6,  # avoid division by zero
         curve, 
         p0=initial_guess,
         bounds=bounds,
         maxfev=10000)
-    print(f"Fitted parameters: a = {params[0]}, b = {params[1]}")
+    print(f"Fitted parameters: a = {params[0]}, b = {params[1]}, c = {params[2]}")
+
+    curve = curve - params[2]  # adjust for offset
+    log_scale = np.log(scale)
+    log_curve = np.log(curve)
+    slope, intercept = np.polyfit(log_scale, log_curve, 1)
+    print(f"Logarithmic slope: {slope}")
     
 # Run the simulation
 for i in range(ITERATIONS):
     walk(1, LENGTH)
 scale_y = space / np.max(space)
-#curve_fiting(scale_x+1e-6, scale_y)
+#curve_fiting(scale_x, scale_y)
 plot_results()
+analyze_spectrum(space)
