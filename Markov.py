@@ -15,13 +15,15 @@ from scipy.optimize import curve_fit
 from spectrum import *
 
 #simulation parameters
-LENGTH=20000            #length of the 1D space
-ITERATIONS=10000        #number of particles
-GRADIENT=2              #gradient of the time dilation field
+LENGTH=100000           #length of the 1D space
+ITERATIONS=100          #number of particles
+GRADIENT=10             #gradient of the time dilation field
 
 # initialization
 space=np.zeros(LENGTH)
-time=np.linspace(0,GRADIENT,LENGTH)
+time=np.linspace(0, GRADIENT, LENGTH)
+max_time=np.max(time)
+time=time/max_time   #normalize time dilation field
 
 scale_x = np.linspace(0, 1, LENGTH)
 scale_y = np.zeros(LENGTH)
@@ -32,7 +34,10 @@ scale_y = np.zeros(LENGTH)
 # returns new position of the particle
 def step(pos, time):
     random=np.random.rand()
-    probability=random+time[pos]
+    if pos >= LENGTH:
+        probability=random
+    else:
+        probability=random-time[pos]
     if probability > 0.5:
         pos=(pos+1)
     else:
@@ -44,12 +49,13 @@ def step(pos, time):
 # length: length of the 1D space
 # updates the global space array with the number of visits to each position
 def walk(start, length):
-    position=start
-    while position < length:
+    position = length
+    count = 0
+    while position >= 0:
         position=step(position, time)
-        if position >= 0 and position < length:
+        if position >= 1 and position < length :
             space[position]+=1
-            
+        
 # brachistochrone curve calculation
 def brachistochrone():
     a = 0.5
