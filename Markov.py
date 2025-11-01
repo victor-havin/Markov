@@ -8,22 +8,28 @@
 # Prereqvisites:
 # - numpy
 # - matplotlib
-
+import sys
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit
 from spectrum import *
 
 #simulation parameters
-LENGTH=100000           #length of the 1D space
-ITERATIONS=100          #number of particles
-GRADIENT=10             #gradient of the time dilation field
+LENGTH=5000            #length of the 1D space
+ITERATIONS=1000         #number of particles
+GRADIENT=1              #gradient of the time dilation field
+LAMBDA=0.1              #scaling factor for particle atttraction
+INCREMENT=1e-9
 
 # initialization
 space=np.zeros(LENGTH)
 time=np.linspace(0, GRADIENT, LENGTH)
 max_time=np.max(time)
 time=time/max_time   #normalize time dilation field
+
+# stats
+nsteps = 0
+nwalks = 0
 
 scale_x = np.linspace(0, 1, LENGTH)
 scale_y = np.zeros(LENGTH)
@@ -32,12 +38,15 @@ scale_y = np.zeros(LENGTH)
 # pos: current position of the particle
 # time: time dilation field
 # returns new position of the particle
-def step(pos, time):
+def step(pos, time,length):
+    global nsteps
+    nsteps += 1
+    probability = 0.5
     random=np.random.rand()
-    if pos >= LENGTH:
-        probability=random
-    else:
-        probability=random-time[pos]
+    if pos >= 0 and pos < length:
+        probability=random-time[pos]+LAMBDA*(pos/length)
+    elif pos < 0 and -pos < length:
+        probability=random-time[-pos]+LAMBDA*(-pos/length)
     if probability > 0.5:
         pos=(pos+1)
     else:
@@ -48,13 +57,16 @@ def step(pos, time):
 # start: starting position of the particle
 # length: length of the 1D space
 # updates the global space array with the number of visits to each position
-def walk(start, length):
+def walk(length):
+    global nwalks
+    nwalks+=1
     position = length
-    count = 0
-    while position >= 0:
-        position=step(position, time)
-        if position >= 1 and position < length :
-            space[position]+=1
+    while position >= -length:
+        position=step(position, time, length)
+        if position >= 0 and position < length :
+            space[position]+=INCREMENT
+        #elif position < 0 and -position < length:
+        #    space[-position]+=1
         
 # brachistochrone curve calculation
 def brachistochrone():
@@ -107,9 +119,16 @@ def curve_fiting(scale, curve):
     print(f"Fitted parameters: a = {params[0]}, b = {params[1]}")
     
 # Run the simulation
+nsteps = nwalks = 0
+print(f"Starting simulation with {ITERATIONS} particles over length {LENGTH}...")
 for i in range(ITERATIONS):
-    walk(1, LENGTH)
+    nsteps = 0
+    walk(LENGTH)
+    sys.stdout.write(f"\rProgress: {nwalks/ITERATIONS*100:.2f}%, Steps taken: {nsteps}")
+print()
+print("Simulation completed. Running analysis...")
 scale_y = space / np.max(space)
 #curve_fiting(scale_x, scale_y)
 plot_results()
 analyze_spectrum(space)
+print("Analysis completed.")

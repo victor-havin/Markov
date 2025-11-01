@@ -83,7 +83,7 @@ def plot_power_spectrum(positive_frequencies, positive_power):
     # Fit a line to the mesoscopic region to find the slope
     # Define a frequency range to fit, avoiding the low-frequency residual spike and high-frequency noise
     # These frequency limits correspond to your mesoscopic scale.
-    low_freq_cut = 2e-3  # Low frequency limit to avoid residual spike
+    low_freq_cut = 4e-3  # Low frequency limit to avoid residual spike
     high_freq_cut = 0.4  # Arbitrary limit to avoid high-frequency noise
 
     freq_range_mask = (positive_frequencies > low_freq_cut) & (positive_frequencies < high_freq_cut)
